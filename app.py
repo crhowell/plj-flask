@@ -21,6 +21,16 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
+@login_manager.user_loader
+def load_user(userid):
+    try:
+        return models.User.select().where(
+            models.User.id == int(userid)
+        ).get()
+    except models.DoesNotExist:
+        return None
+
+
 @app.before_request
 def before_request():
     g.db = models.DATABASE
@@ -37,6 +47,13 @@ def after_request(response):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/list')
+@login_required
+def entry_list():
+    entries = current_user.entries
+    return render_template('index.html', entries=entries)
 
 
 @app.route('/register', methods=('GET', 'POST'))
@@ -77,5 +94,6 @@ def logout():
 
 if __name__ == '__main__':
     models.initialize()
+
     app.run(debug=DEBUG, host=HOST, port=PORT)
 

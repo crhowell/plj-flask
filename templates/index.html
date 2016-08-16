@@ -3,7 +3,7 @@
 {% block section_content %}
 <div class="entry-list">
     {% if current_user.is_authenticated %}
-        {% if entries.count() %}
+        {% if entries %}
             <article>
                 <h2><a href="detail.html">The best day I’ve ever had</a></h2>
                 <time datetime="2016-01-31">January 31, 2016</time>
