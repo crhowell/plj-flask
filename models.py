@@ -1,7 +1,7 @@
 import datetime
 
-from flask.ext.bcrypt import generate_password_hash
-from flask.ext.login import UserMixin
+from flask_bcrypt import generate_password_hash
+from flask_login import UserMixin
 from peewee import *
 
 DATABASE = SqliteDatabase('journal.db')
@@ -37,7 +37,13 @@ class Entry(Model):
     learned = TextField(default='')
     resources = TextField(default='')
     tags = CharField(default='')
-    user = ForeignKeyField('User', related_name='entries')
+    user = ForeignKeyField(User, related_name='entries')
 
     class Meta:
         database = DATABASE
+
+
+def initialize():
+    DATABASE.connect()
+    DATABASE.create_tables([User, Entry], safe=True)
+    DATABASE.close()

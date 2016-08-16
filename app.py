@@ -2,15 +2,17 @@ import datetime
 
 from flask import (Flask, g, render_template, flash, redirect,
                    url_for)
-from flask.ext.bcrypt import check_password_hash
-from flask.ext.login import (LoginManager, login_user, current_user,
-                             login_required, logout_user)
+
+from flask_bcrypt import check_password_hash
+from flask_login import (LoginManager, login_user, current_user,
+                         login_required, logout_user)
 
 import models
 
 DEBUG = True
-PORT = 8000
 HOST = '0.0.0.0'
+PORT = 8000
+
 
 app = Flask(__name__)
 app.secret_key = 'lKJlknm12lknasldkjalksjda'
@@ -38,4 +40,6 @@ def index():
 
 
 if __name__ == '__main__':
+    models.initialize()
     app.run(debug=DEBUG, host=HOST, port=PORT)
+
