@@ -17,7 +17,6 @@ class User(UserMixin, Model):
 
     class Meta:
         database = DATABASE
-        order_by = ('-created_at',)
 
     @classmethod
     def create_user(cls, username, email, password, admin=False):
@@ -29,3 +28,16 @@ class User(UserMixin, Model):
                 is_admin=admin)
         except IntegrityError:
             raise ValueError("User already exists")
+
+
+class Entry(Model):
+    title = CharField(max_length=100)
+    date = DateField(default=datetime.datetime.today)
+    time_spent = IntegerField()
+    learned = TextField(default='')
+    resources = TextField(default='')
+    tags = CharField(default='')
+    user = ForeignKeyField('User', related_name='entries')
+
+    class Meta:
+        database = DATABASE
