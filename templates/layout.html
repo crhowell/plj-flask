@@ -12,11 +12,28 @@
     </head>
 
     <body>
+        {% with messages=get_flashed_messages() %}
+        {% if messages %}
+            <div class="messages">
+              {% for message in messages %}
+              <div class="message">
+                {{ message }}
+              </div>
+              {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
         <header>
             <div class="container">
                 <div class="site-header">
                     <a class="logo" href="{{ url_for('index') }}"><i class="material-icons">library_books</i></a>
-                    <a class="button icon-right" href="new.html"><span>New Entry</span> <i class="material-icons">add</i></a>
+                    {% if current_user.is_authenticated %}
+                        <a class="button icon-right" href="new.html"><span>New Entry</span> <i class="material-icons">add</i></a>
+                        <a class="button icon-right" href="{{ url_for('logout') }}"><span>Logout</span> <i class="material-icons">ic_exit_to_app</i></a>
+                    {% else %}
+                        <a class="button icon-right" href="{{ url_for('login') }}"><span>Login</span> <i class="material-icons">ic_perm_identity</i></a>
+                        <a class="button icon-right" href="{{ url_for('register') }}"><span>Sign Up</span> <i class="material-icons">ic_thumb_up</i></a>
+                    {% endif %}
                 </div>
             </div>
         </header>
