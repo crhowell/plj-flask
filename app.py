@@ -46,7 +46,33 @@ def after_request(response):
 
 @app.route('/')
 def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('entry_list'))
     return render_template('index.html')
+
+
+@app.route('/new', methods=('GET', 'POST'))
+@login_required
+def new_entry():
+    form = forms.EntryForm()
+    if form.validate_on_submit():
+        models.Entry.create(user=g.user._get_current_object(),
+                            title=form.title.data,
+                            date=form.date.data,
+                            time_spent=form.time_spent.data,
+                            learned=form.learned.data.strip(),
+                            resources=form.resources.data.strip(),
+                            tags=form.tags.data)
+        flash("Entry Added!", "success")
+        return redirect(url_for('entry_list'))
+
+    return render_template('new.html', form=form)
+
+
+@app.route('/detail')
+@login_required
+def entry_detail():
+    return render_template('detail.html')
 
 
 @app.route('/list')
@@ -79,7 +105,7 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 login_user(user)
                 flash("You're now logged in!")
-                return redirect(url_for('index'))
+                return redirect(url_for('entry_list'))
             else:
                 flash("No user with that email/password combo")
         except models.DoesNotExist:
