@@ -10,8 +10,6 @@ DATABASE = SqliteDatabase('journal.db')
 class User(UserMixin, Model):
     email = CharField(unique=True)
     password = CharField(max_length=120)
-    created_at = DateTimeField(default=datetime.datetime.now)
-    last_modified = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
         database = DATABASE

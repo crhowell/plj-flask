@@ -49,6 +49,25 @@ def index():
     return redirect(url_for('entry_list'))
 
 
+@app.route('/entries/remove/<int:entry_id>')
+@login_required
+def entry_delete(entry_id=None):
+    if entry_id is not None:
+        try:
+            entry = models.Entry.get(id=entry_id)
+            if entry.user == current_user:
+                entry.delete_instance()
+                flash('Entry has been removed.')
+                return redirect(url_for('entry_list'))
+            flash('Invalid permissions, must be owner')
+            return redirect(url_for('entry_list'))
+        except models.DoesNotExist:
+            flash('That entry does not exist.')
+            return redirect(url_for('entry_list'))
+
+    return redirect(url_for('entry_list'))
+
+
 @app.route('/entries/edit/<int:entry_id>', methods=('GET', 'POST'))
 @login_required
 def entry_edit(entry_id=None):
@@ -67,7 +86,7 @@ def entry_edit(entry_id=None):
                     entry.tags = form.tags.data
                     entry.save()
                     return redirect(url_for('entry_detail', entry_id=entry.id))
-                flash('warning', 'You are not the owner of this entry.')
+                flash('Invalid permissions, must be owner')
                 return redirect(url_for('entry_detail', entry_id=entry.id))
 
             form.title.data = entry.title
@@ -80,7 +99,7 @@ def entry_edit(entry_id=None):
             return render_template('edit.html', form=form, entry_id=entry_id)
 
         except models.DoesNotExist:
-            flash('warning', 'That entry does not exist.')
+            flash('That entry does not exist.')
     return redirect(url_for('entry_list'))
 
 
@@ -91,7 +110,7 @@ def entry_detail(entry_id=None):
             entry = models.Entry.get(id=entry_id)
             return render_template('detail.html', entry=entry)
         except models.DoesNotExist:
-            flash('warning', 'That entry does not exist.')
+            flash('That entry does not exist.')
             return redirect(url_for('entry_list'))
     return redirect(url_for('entry_list'))
 
@@ -108,7 +127,7 @@ def new_entry():
                             learned=form.learned.data.strip(),
                             resources=form.resources.data.strip(),
                             tags=form.tags.data)
-        flash("Entry Added!", "success")
+        flash("Entry Added!")
         return redirect(url_for('entry_list'))
 
     return render_template('new.html', form=form)
@@ -146,8 +165,10 @@ def login():
                 return redirect(url_for('entry_list'))
             else:
                 flash("No user with that email/password combo")
+                return redirect(url_for('login'))
         except models.DoesNotExist:
             flash("No user with that email/password combo")
+            return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
 
@@ -158,6 +179,13 @@ def logout():
 
 if __name__ == '__main__':
     models.initialize()
+    try:
+        models.User.create_user(
+            email='admin@example.com',
+            password='password'
+        )
+    except ValueError:
+        pass
 
     app.run(debug=DEBUG, host=HOST, port=PORT)
 
