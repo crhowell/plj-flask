@@ -5,8 +5,10 @@
     <div class="edit-entry">
         <h2>Edit Entry</h2>
         <form method="POST" action="">
-            {% for field  in form %}
-                {{ render_field(field) }}
+            {% for field in form %}
+                {% if field.type != 'hidden' %}
+                    {{ render_field(field) }}
+                {% endif %}
             {% endfor %}
             <input type="submit" value="Update Entry" class="button">
             <a href="{{ url_for('entry_list') }}" class="button button-secondary">Cancel</a>

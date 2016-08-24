@@ -74,8 +74,8 @@ def entry_edit(entry_id=None):
             form.date.data = entry.date
             form.time_spent.data = entry.time_spent
             form.learned.data = entry.learned
-            form.resources = entry.resources
-            form.tags = entry.tags
+            form.resources.data = entry.resources
+            form.tags.data = entry.tags
 
             return render_template('edit.html', form=form, entry_id=entry_id)
 

@@ -8,6 +8,6 @@
             </ul>
         </div>
     {% endif %}
-    {{ field.label }}
+    {% if field.widget.input_type != 'hidden' %} {{ field.label }} {% endif %}
     {{ field(class="row") }}
 {% endmacro %}

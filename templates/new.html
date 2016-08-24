@@ -7,7 +7,7 @@
             <div class="new-entry">
                 <h2>New Entry</h2>
                 <form method="POST" action="{{ url_for('new_entry') }}">
-                    {{ form.hidden_tag() }}
+                    
                     {% for field in form %}
                       {{ render_field(field) }}
                     {% endfor %}
