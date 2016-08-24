@@ -2,22 +2,16 @@
 
 {% block section_content %}
 <div class="entry-list">
-    {% if current_user.is_authenticated %}
-        {% if entries %}
-            {% for entry in entries %}
-                <article>
-                    <h2><a href="{{ url_for('entry_detail') }}">{{ entry.title }}</a></h2>
-                    <time datetime="entry.date">{{ entry.date.strftime('%B %d, %Y') }}</time>
-                </article>
-            {% endfor %}
-        {% else %}
+    {% if entries %}
+        {% for entry in entries %}
             <article>
-                <h2>You haven't added any Journal Entries.</h2>
+                <h2><a href="{{ url_for('entry_detail', entry_id=entry.id) }}">{{ entry.title }}</a></h2>
+                <time datetime="entry.date">{{ entry.date.strftime('%B %d, %Y') }}</time>
             </article>
-        {% endif %}
+        {% endfor %}
     {% else %}
         <article>
-            <h2><button><a href="{{ url_for('login') }}">Login</a></button> to add/view your journal entries.</h2>
+            <h2>Sorry, no entries have been added yet.</h2>
         </article>
     {% endif %}
 

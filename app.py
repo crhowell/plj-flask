@@ -46,12 +46,57 @@ def after_request(response):
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        return redirect(url_for('entry_list'))
-    return render_template('index.html')
+    return redirect(url_for('entry_list'))
 
 
-@app.route('/new', methods=('GET', 'POST'))
+@app.route('/entries/edit/<int:entry_id>', methods=('GET', 'POST'))
+@login_required
+def entry_edit(entry_id=None):
+    if entry_id is not None:
+        try:
+            entry = models.Entry.get(id=entry_id)
+            form = forms.EntryForm()
+
+            if form.validate_on_submit():
+                if entry.user == current_user:
+                    entry.title = form.title.data
+                    entry.date = form.date.data
+                    entry.time_spent = form.time_spent.data
+                    entry.learned = form.learned.data
+                    entry.resources = form.resources.data
+                    entry.tags = form.tags.data
+                    entry.save()
+                    return redirect(url_for('entry_detail', entry_id=entry.id))
+                flash('warning', 'You are not the owner of this entry.')
+                return redirect(url_for('entry_detail', entry_id=entry.id))
+
+            form.title.data = entry.title
+            form.date.data = entry.date
+            form.time_spent.data = entry.time_spent
+            form.learned.data = entry.learned
+            form.resources = entry.resources
+            form.tags = entry.tags
+
+            return render_template('edit.html', form=form, entry_id=entry_id)
+
+        except models.DoesNotExist:
+            flash('warning', 'That entry does not exist.')
+    return redirect(url_for('entry_list'))
+
+
+@app.route('/entries/<int:entry_id>')
+def entry_detail(entry_id=None):
+    if entry_id is not None:
+        try:
+            entry = models.Entry.get(id=entry_id)
+            return render_template('detail.html', entry=entry)
+        except models.DoesNotExist:
+            flash('warning', 'That entry does not exist.')
+            return redirect(url_for('entry_list'))
+    return redirect(url_for('entry_list'))
+
+
+@app.route('/entries/new', methods=('GET', 'POST'))
 @login_required
 def new_entry():
     form = forms.EntryForm()
@@ -69,16 +114,9 @@ def new_entry():
     return render_template('new.html', form=form)
 
 
-@app.route('/detail')
-@login_required
-def entry_detail():
-    return render_template('detail.html')
-
-
-@app.route('/list')
-@login_required
+@app.route('/entries')
 def entry_list():
-    entries = current_user.entries
+    entries = models.Entry.select()
     return render_template('index.html', entries=entries)
 
 
